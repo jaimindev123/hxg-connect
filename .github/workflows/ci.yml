@@ -1,0 +1,43 @@
+name: ci
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_PASSWORD: postgres, POSTGRES_DB: hxg_connect }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 3s --health-retries 20
+    env:
+      DATABASE_OWNER_URL: postgres://postgres:postgres@localhost:5432/hxg_connect
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+
+      - name: API - install, build, migrate, test
+        working-directory: apps/api
+        run: |
+          npm ci
+          npx tsc -p tsconfig.json
+          node scripts/migrate.mjs
+          node --test test/*.test.mjs
+
+      - name: Web - type-check and build
+        working-directory: apps/web
+        run: |
+          npm ci
+          npm run build
+
+      - name: Mobile - type-check and Android bundle
+        working-directory: apps/mobile
+        run: |
+          npm ci
+          npx tsc --noEmit
+          CI=1 npx expo export --platform android --output-dir /tmp/expo-out
+
+      - name: Docker image builds
+        run: docker build -t hxg-connect:ci .

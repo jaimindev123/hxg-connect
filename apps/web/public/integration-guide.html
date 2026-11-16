@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lead Integration Guide</title>
+<meta name="description" content="How to send leads into HXG Connect from websites, stores, marketplaces, form tools, automation tools and your own software.">
+<style>
+  :root { --bg:#fff; --ink:#0a0a0a; --muted:#555; --line:#d9d9d9; --sunk:#f4f4f4; --code:#0a0a0a; --code-ink:#f5f5f5; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#0a0a0a; --ink:#f5f5f5; --muted:#a8a8a8; --line:#333; --sunk:#171717; --code:#171717; --code-ink:#f5f5f5; } }
+  :root[data-theme="dark"] { --bg:#0a0a0a; --ink:#f5f5f5; --muted:#a8a8a8; --line:#333; --sunk:#171717; --code:#171717; --code-ink:#f5f5f5; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; -webkit-text-size-adjust:100%; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px 80px; display:grid; grid-template-columns: 220px minmax(0,1fr); gap: 40px; }
+  header.top { border-bottom: 2px solid var(--ink); margin-bottom: 28px; }
+  header.top div { max-width:1080px; margin:0 auto; padding: 22px 16px 18px; }
+  .brand { font-weight:800; letter-spacing:.14em; font-size:13px; text-transform:uppercase; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height:1.15; margin: 6px 0 8px; letter-spacing:-.02em; }
+  header.top p { margin:0; color:var(--muted); max-width: 62ch; }
+  nav { position: sticky; top: 16px; align-self:start; font-size:14px; max-height: calc(100vh - 32px); overflow:auto; }
+  nav b { display:block; margin: 14px 0 4px; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  nav a { display:block; padding: 3px 0; color:var(--ink); text-decoration:none; }
+  nav a:hover { text-decoration: underline; }
+  h2 { font-size: 24px; margin: 44px 0 10px; padding-top: 18px; border-top: 2px solid var(--ink); letter-spacing:-.01em; }
+  main > h2:first-child { margin-top:0; border-top:0; padding-top:0; }
+  h3 { font-size: 18px; margin: 30px 0 6px; }
+  p, li { max-width: 72ch; }
+  a { color: var(--ink); }
+  code { font: 13.5px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: var(--sunk); padding: 1px 5px; border-radius: 4px; overflow-wrap:anywhere; }
+  pre { background: var(--code); color: var(--code-ink); padding: 14px 16px; border-radius: 8px; overflow-x:auto; margin: 10px 0 16px; border:1px solid var(--line); }
+  pre code { background:none; padding:0; color:inherit; overflow-wrap:normal; }
+  .tbl { overflow-x:auto; margin: 10px 0 16px; }
+  table { border-collapse: collapse; width:100%; font-size: 14.5px; min-width: 520px; }
+  th, td { text-align:left; padding: 8px 10px; border-bottom:1px solid var(--line); vertical-align: top; }
+  th { border-bottom: 2px solid var(--ink); font-size: 12px; letter-spacing:.08em; text-transform:uppercase; }
+  .note { border:2px solid var(--ink); border-radius:8px; padding: 12px 14px; margin: 14px 0; max-width: 72ch; }
+  .tag { display:inline-block; border:1px solid var(--ink); border-radius: 99px; font-size: 11px; letter-spacing:.06em; text-transform:uppercase; padding: 1px 8px; margin-left:6px; vertical-align: 2px; white-space:nowrap; }
+  .tag.solid { background: var(--ink); color: var(--bg); }
+  ol, ul { padding-left: 22px; }
+  li { margin: 3px 0; }
+  @media (max-width: 820px) { .wrap { grid-template-columns: minmax(0,1fr); gap: 0; } nav { position: static; max-height:none; border:1px solid var(--line); border-radius:8px; padding: 4px 14px 12px; margin-bottom: 26px; columns: 2; } nav b { break-after: avoid; } }
+</style>
+</head>
+<body>
+<header class="top"><div>
+  <div class="brand">HXG Connect</div>
+  <h1>Lead integration guide</h1>
+  <p>How to send leads into HXG Connect from a website, an online store, a marketplace listing, a form tool, an automation tool, or your own software. Written for the person doing the setup, and for developers at platforms that want to connect to us.</p>
+</div></header>
+
+<div class="wrap">
+<nav aria-label="Contents">
+  <b>Basics</b>
+  <a href="#how">How it works</a><a href="#quick">Send your first lead</a><a href="#fields">Fields we read</a><a href="#replies">Replies</a><a href="#rules">Duplicates and retries</a><a href="#security">Security</a>
+  <b>Websites and stores</b>
+  <a href="#wordpress">WordPress</a><a href="#shopify">Shopify</a><a href="#wix">Wix</a><a href="#webflow">Webflow</a><a href="#html">Any HTML form</a>
+  <b>Form tools</b>
+  <a href="#google_forms">Google Forms</a><a href="#typeform">Typeform</a><a href="#jotform">Jotform</a><a href="#tally">Tally</a>
+  <b>Marketplaces</b>
+  <a href="#indiamart">IndiaMART</a><a href="#justdial">JustDial</a><a href="#sulekha">Sulekha</a><a href="#portals">Property portals</a>
+  <b>Ads</b>
+  <a href="#meta">Facebook, Instagram</a><a href="#google_ads">Google Ads</a><a href="#linkedin">LinkedIn, others</a>
+  <b>Automation</b>
+  <a href="#zapier">Zapier</a><a href="#make">Make</a><a href="#pabbly">Pabbly Connect</a><a href="#n8n">n8n</a>
+  <b>Developers</b>
+  <a href="#custom">Your own system</a><a href="#code">Code samples</a><a href="#partners">For platform teams</a>
+</nav>
+
+<main>
+<h2 id="how">How it works</h2>
+<p>Every HXG Connect workspace has a private address for each platform it connects. A platform sends a lead to that address, and within a second or two the lead is in the CRM: checked for duplicates and assigned to a salesperson by the workspace's rules.</p>
+<pre><code>https://yourworkspace.hxgconnect.com/api/webhooks/in/<b>{platform}</b>/<b>{your-key}</b></code></pre>
+<p>You get the addresses in HXG Connect under <b>Settings &gt; Integrations &gt; Websites, marketplaces and other platforms</b>. Save the integration once, pick a platform, and copy its address. The same screen has a <b>Send test</b> button and a log of recent deliveries.</p>
+<p>There is no field mapping to do. Platforms disagree about names (<code>phone</code>, <code>Mobile No.</code>, <code>your-tel</code>, <code>SENDER_MOBILE</code>), so we read whatever arrives and work out which value is the name, the mobile number, the email and the message.</p>
+<div class="note"><b>One rule:</b> a lead needs a mobile number. An enquiry with only an email address is not added; it waits under "Couldn't be added" on the setup screen. Make the phone field required on your forms.</div>
+
+<h2 id="quick">Send your first lead</h2>
+<p>Copy the address for <b>Any other platform</b> and run this from any terminal:</p>
+<pre><code>curl -X POST "https://yourworkspace.hxgconnect.com/api/webhooks/in/custom/YOUR-KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Asha Verma","phone":"9820012345","email":"asha@example.com","message":"Interested in a 2BHK"}'</code></pre>
+<p>You get back:</p>
+<pre><code>{"status":"success","message":"Lead added"}</code></pre>
+<p>Open <b>Leads</b> in HXG Connect and Asha is there.</p>
+
+<h2 id="fields">Fields we read</h2>
+<p>Send JSON (<code>application/json</code>), a normal form post (<code>application/x-www-form-urlencoded</code>) or <code>multipart/form-data</code>. Nesting is fine: we look inside objects, and inside lists of <code>{"label": …, "value": …}</code> pairs.</p>
+<div class="tbl"><table>
+<thead><tr><th>What</th><th>Names we recognise</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><b>Name</b></td><td><code>name</code>, <code>full_name</code>, <code>your-name</code>, <code>first_name</code> + <code>last_name</code>, <code>customer_name</code>, <code>contact_name</code></td><td>If there's no name we use the part of the email before the @.</td></tr>
+<tr><td><b>Mobile</b> <span class="tag solid">required</span></td><td><code>phone</code>, <code>mobile</code>, <code>mobile_no</code>, <code>phone_number</code>, <code>contact_no</code>, <code>tel</code>, <code>your-tel</code>, <code>whatsapp</code>, or any field whose name contains "phone" or "mobile"</td><td>10-digit Indian numbers get +91. Send other countries with the country code: <code>+971501234567</code>. Spaces, dashes and brackets are fine.</td></tr>
+<tr><td><b>Email</b></td><td><code>email</code>, <code>email_id</code>, <code>your-email</code>, <code>email_address</code></td><td></td></tr>
+<tr><td><b>Message</b></td><td><code>message</code>, <code>query</code>, <code>comments</code>, <code>enquiry</code>, <code>requirement</code>, <code>remarks</code>, <code>notes</code></td><td>Shown on the lead's timeline.</td></tr>
+<tr><td><b>Enquired about</b></td><td><code>project</code>, <code>product</code>, <code>property</code>, <code>subject</code>, <code>service</code>, <code>category</code>, <code>interested_in</code></td><td>Added to the timeline as "Enquired about …".</td></tr>
+<tr><td><b>City / area</b></td><td><code>city</code>, <code>location</code>, <code>locality</code>, <code>area</code></td><td></td></tr>
+<tr><td><b>Budget</b></td><td><code>budget</code></td><td><code>85L</code>, <code>85 lakh</code>, <code>1.2 Cr</code>, <code>8500000</code> all work.</td></tr>
+<tr><td><b>Property type</b></td><td><code>property_type</code>, <code>unit_type</code>, <code>configuration</code></td><td>Read from words like 2BHK, flat, villa, plot, shop, office.</td></tr>
+<tr><td><b>Campaign</b></td><td><code>utm_source</code>, <code>utm_medium</code>, <code>utm_campaign</code>, <code>utm_content</code>, <code>utm_term</code>, <code>gclid</code>, <code>fbclid</code>, <code>page_url</code>, <code>form_name</code></td><td>Kept on the lead for reports.</td></tr>
+<tr><td><b>Company</b></td><td><code>company</code>, <code>company_name</code>, <code>organisation</code></td><td></td></tr>
+<tr><td><b>Your reference</b></td><td><code>lead_id</code>, <code>enquiry_id</code>, <code>submission_id</code>, or an <code>Idempotency-Key</code> header</td><td>Used to ignore repeat deliveries. See below.</td></tr>
+</tbody></table></div>
+<p>Anything else at the top level of what you send (up to 18 short values) is kept on the lead as extra details. Passwords, tokens, captcha answers and consent tick-boxes are dropped.</p>
+<p><b>Lead source.</b> The source is the platform in the address: <code>wordpress</code>, <code>shopify</code>, <code>indiamart</code> and so on. On the <code>custom</code> address you choose it by adding <code>?source=property_expo_2026</code>.</p>
+
+<h2 id="replies">Replies</h2>
+<div class="tbl"><table>
+<thead><tr><th>Status</th><th>Body</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><code>200</code></td><td><code>{"status":"success","message":"Lead added"}</code></td><td>A new lead was created and assigned.</td></tr>
+<tr><td><code>200</code></td><td><code>{"status":"success","message":"Existing lead updated"}</code></td><td>That mobile number is already a lead. The new enquiry was added to its timeline.</td></tr>
+<tr><td><code>200</code></td><td><code>{"status":"success","message":"Already received"}</code></td><td>Same reference as an earlier delivery. Nothing was added twice.</td></tr>
+<tr><td><code>200</code></td><td><code>{"status":"held","message":"Received, but not added: …"}</code></td><td>Only on platforms that switch a webhook off after errors (Shopify, IndiaMART, Typeform and similar). The entry waits for a person to look at it.</td></tr>
+<tr><td><code>422</code></td><td><code>{"status":"failed","message":"No mobile number found…"}</code></td><td>The lead couldn't be read. Fix the payload and send again. Used on WordPress, automation tools and <code>custom</code>.</td></tr>
+<tr><td><code>401</code></td><td><code>{"status":"failed","message":"Signature check failed"}</code></td><td>Shopify or Typeform secret doesn't match the one saved in HXG Connect.</td></tr>
+<tr><td><code>404</code></td><td><code>{"status":"failed","message":"Unknown address"}</code></td><td>Wrong platform name or key. Copy the address again.</td></tr>
+<tr><td><code>429</code></td><td></td><td>More than 240 leads in a minute on one address. Wait and retry.</td></tr>
+</tbody></table></div>
+<p>Opening an address in a browser (a plain GET) answers <code>{"status":"ready"}</code>, which is a quick way to check you copied it correctly.</p>
+
+<h2 id="rules">Duplicates and retries</h2>
+<ul>
+<li><b>One buyer, one lead.</b> Leads are matched on mobile number within a workspace. The same buyer coming from your website on Monday and IndiaMART on Thursday stays one lead with two entries on the timeline.</li>
+<li><b>Retries are safe.</b> If your system sends a reference (see the table above) and repeats a delivery, we answer "Already received". Without a reference, a repeat is still caught by the mobile number and shows as a second enquiry on the same lead.</li>
+<li><b>If we don't answer</b> within your timeout, or answer 5xx, retry with the same reference. A sensible schedule is 1 minute, 5 minutes, 30 minutes, then hourly for a day.</li>
+<li><b>Assignment.</b> New leads are assigned by the workspace's rules (source, location, budget, property type, round-robin). You can't choose the salesperson from outside.</li>
+</ul>
+
+<h2 id="security">Security</h2>
+<ul>
+<li><b>The address is the credential.</b> The key in it is long and random. Anyone holding the address can add leads to that workspace and nothing else: it can't read, change or delete anything. Don't put it in public page source; for browser forms use the <a href="#html">website key</a> instead.</li>
+<li><b>HTTPS only</b> in production.</li>
+<li><b>Signed deliveries.</b> For Shopify and Typeform, save the platform's signing secret in HXG Connect and unsigned posts to that address are refused.</li>
+<li><b>If an address leaks,</b> press Disconnect on the integration and set it up again. Every address gets a new key and the old ones stop working at once.</li>
+<li><b>What we keep.</b> The delivery log shows the lead's name and the last four digits of the number. The full payload is stored only when a lead couldn't be added, so someone can enter it by hand.</li>
+</ul>
+
+<h2 id="wordpress">WordPress <span class="tag solid">plugin</span></h2>
+<p>One plugin covers the common form builders, with no per-form setup: <b>Contact Form 7, WPForms, Elementor Pro, Gravity Forms, Ninja Forms, Fluent Forms, Formidable Forms</b>, and optionally <b>WooCommerce</b> orders.</p>
+<ol>
+<li>In HXG Connect, choose <b>WordPress</b> on the connector screen and press <b>Download the WordPress plugin</b>.</li>
+<li>In WordPress: <b>Plugins &gt; Add New &gt; Upload Plugin</b>, choose the zip, activate.</li>
+<li>Open <b>Settings &gt; HXG Connect Leads</b>, paste your WordPress address, save.</li>
+<li>Press <b>Send test lead</b>. The page lists which form plugins it found and shows the result of each send.</li>
+</ol>
+<p>Your forms keep working as before: emails still go out and entries are still saved in WordPress. The plugin sends the enquiry before the email step, so a broken mail setup on the site doesn't cost you leads.</p>
+<p><b>Elementor Pro without the plugin.</b> In the form widget, add <b>Actions After Submit &gt; Webhook</b> and paste the same address. Both the simple and "Advanced data" formats are read.</p>
+<p><b>Developers</b> can add or change what is sent with the <code>hxg_connect_leads_payload</code> filter:</p>
+<pre><code>add_filter( 'hxg_connect_leads_payload', function ( $payload, $plugin ) {
+    $payload['project'] = 'Sunrise Heights';   // tag every lead from this site
+    return $payload;                            // return false to skip a submission
+}, 10, 2 );</code></pre>
+
+<h2 id="shopify">Shopify</h2>
+<ol>
+<li>Shopify admin: <b>Settings &gt; Notifications &gt; Webhooks &gt; Create webhook</b>.</li>
+<li>Event <b>Customer creation</b>, format <b>JSON</b>, URL = your Shopify address. Save.</li>
+<li>Add a second webhook for <b>Order creation</b> if buyers should become leads too. The lead is the customer; the order number, total and items go on the timeline.</li>
+<li>Copy the signing secret Shopify shows below the webhook list into <b>Shopify webhook signing secret</b> in HXG Connect.</li>
+</ol>
+<p>We verify Shopify's <code>X-Shopify-Hmac-Sha256</code> header against that secret and use <code>X-Shopify-Webhook-Id</code> to ignore retries. Shopify removes a webhook after repeated failures, so this address always answers 200; customers without a phone number show up under "Couldn't be added".</p>
+<p>Shopify's theme contact form sends an email and creates nothing we can listen to. To capture those, use the <a href="#html">website snippet</a> on the contact page, or a form app that creates a customer.</p>
+
+<h2 id="wix">Wix</h2>
+<ol><li>Dashboard &gt; <b>Automations</b> &gt; new automation.</li><li>Trigger: <b>Wix Forms: form submitted</b>. Action: <b>Send via webhook</b>.</li><li>Target URL = your Wix address. Keep "All keys and values". Activate.</li></ol>
+
+<h2 id="webflow">Webflow</h2>
+<ol><li><b>Site settings &gt; Apps &amp; integrations &gt; Webhooks</b>.</li><li>Add a webhook with trigger type <b>Form submission</b> and your Webflow address.</li><li>Publish and submit the form once.</li></ol>
+
+<h2 id="html">Any HTML form <span class="tag">website key</span></h2>
+<p>For a hand-built site, use a <b>website key</b> instead of a connector address. A website key is safe to place in page source: it can only create leads, and you can revoke it. Create one in HXG Connect under <b>Settings &gt; Lead capture &gt; Website forms</b>, which also gives you a ready-made snippet.</p>
+<pre><code>&lt;form action="https://yourworkspace.hxgconnect.com/api/capture/leads" method="post"&gt;
+  &lt;input type="hidden" name="api_key" value="hxgk_…"&gt;
+  &lt;input type="hidden" name="redirect" value="https://yoursite.com/thank-you"&gt;
+  &lt;input name="name" required&gt;
+  &lt;input name="phone" required&gt;
+  &lt;input name="email" type="email"&gt;
+  &lt;textarea name="message"&gt;&lt;/textarea&gt;
+  &lt;input name="website" style="display:none" tabindex="-1" autocomplete="off"&gt; &lt;!-- spam trap: leave empty --&gt;
+  &lt;button&gt;Send&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+<p>From JavaScript, POST JSON to the same URL with the header <code>x-api-key</code>. This endpoint takes the exact field names <code>name</code>, <code>phone</code>, <code>email</code>, <code>message</code>, <code>budget</code>, <code>property_type</code>, <code>location</code>, <code>project</code>, <code>source</code>, <code>utm_*</code> and <code>page_url</code>, answers <code>201 {"ok":true}</code>, and allows 60 leads a minute per key.</p>
+
+<h2 id="google_forms">Google Forms</h2>
+<ol>
+<li>Open the form, press the three dots, choose <b>Apps Script</b>.</li>
+<li>Replace the contents with the script below and paste your Google Forms address into the first line.</li>
+<li>In Apps Script open <b>Triggers &gt; Add trigger</b>: function <code>onFormSubmit</code>, event source <b>From form</b>, event type <b>On form submit</b>. Approve the permission prompt.</li>
+</ol>
+<pre><code>const HXG_URL = 'PASTE YOUR GOOGLE FORMS ADDRESS HERE';
+
+function onFormSubmit(e) {
+  const fields = {};
+  e.response.getItemResponses().forEach(function (r) {
+    fields[r.getItem().getTitle()] = String(r.getResponse());
+  });
+  const email = e.response.getRespondentEmail();
+  if (email) fields.email = email;
+  UrlFetchApp.fetch(HXG_URL, {
+    method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+    payload: JSON.stringify({ form_name: FormApp.getActiveForm().getTitle(), fields: fields })
+  });
+}</code></pre>
+<p>Question titles become the field names, so a question called "Mobile number" is read as the mobile.</p>
+
+<h2 id="typeform">Typeform</h2>
+<ol><li>Form &gt; <b>Connect &gt; Webhooks &gt; Add a webhook</b>, paste your Typeform address, switch it on.</li><li>Optional: set a secret on the webhook and save the same value in <b>Typeform webhook secret</b> in HXG Connect.</li></ol>
+<p>Use Typeform's <b>Phone number</b> and <b>Email</b> question types so those answers are recognised whatever the question says. Hidden fields such as <code>utm_source</code> are kept.</p>
+
+<h2 id="jotform">Jotform</h2>
+<ol><li>Form &gt; <b>Settings &gt; Integrations &gt; WebHooks</b>.</li><li>Paste your Jotform address and complete the integration.</li></ol>
+
+<h2 id="tally">Tally</h2>
+<ol><li>Form &gt; <b>Integrations &gt; Webhooks &gt; Connect</b>.</li><li>Paste your Tally address as the endpoint URL.</li></ol>
+
+<h2 id="indiamart">IndiaMART</h2>
+<p>IndiaMART pushes each enquiry, buy-lead and call the moment it happens.</p>
+<ol>
+<li>Sign in at <b>seller.indiamart.com</b> and open <b>Lead Manager</b>.</li>
+<li>Three-dots menu &gt; <b>Push API</b> (under Import/Export Leads).</li>
+<li>CRM: <b>Other</b>. Platform name: <b>HXG Connect</b>. Webhook URL: your IndiaMART address.</li>
+<li>Confirm the OTP sent to your primary mobile, then use IndiaMART's test button.</li>
+</ol>
+<p>The buyer's name, mobile, email, company, city, product and message come through, with the enquiry type (direct enquiry, buy lead, phone call, catalogue view, WhatsApp). Retries are matched on IndiaMART's <code>UNIQUE_QUERY_ID</code>. IndiaMART switches Push API off if a CRM refuses leads for 48 hours, so this address always answers 200.</p>
+
+<h2 id="justdial">JustDial <span class="tag">set up by their team</span></h2>
+<p>JustDial configures the push on their side. On the connector screen choose JustDial and press <b>Email account manager</b>: it opens a ready-written request with your address. Ask them for a test lead when it's done.</p>
+<p>The address accepts JustDial's GET or POST delivery and answers <code>RECEIVED</code>.</p>
+
+<h2 id="sulekha">Sulekha <span class="tag">set up by their team</span></h2>
+<p>Same route as JustDial: send your Sulekha address to your account manager and ask for a test lead.</p>
+
+<h2 id="portals">Property portals</h2>
+<p>99acres, MagicBricks, Housing.com, NoBroker, Square Yards, CommonFloor, PropTiger and Makaan have their own integration in HXG Connect: <b>Settings &gt; Integrations &gt; Property portals</b>. Two routes:</p>
+<ul>
+<li><b>Forward the portal's lead emails</b> to your private HXG Connect address. Works with every portal, and with TradeIndia and others that only email leads.</li>
+<li><b>Direct push.</b> 99acres and MagicBricks set this up through your account manager; the screen writes that email for you.</li>
+</ul>
+
+<h2 id="meta">Facebook and Instagram lead ads</h2>
+<p>Built in: <b>Settings &gt; Integrations &gt; Facebook and Instagram lead ads</b>. Enter your Page ID, a long-lived Page token with <code>leads_retrieval</code>, and your Meta app secret; then add the webhook URL and verify token the screen shows to your Meta app and subscribe to <code>leadgen</code>.</p>
+
+<h2 id="google_ads">Google Ads lead forms</h2>
+<p>Built in: <b>Settings &gt; Integrations &gt; Google Ads lead forms</b>. Paste the webhook URL and key into the lead form asset in Google Ads and press <b>Send test data</b>.</p>
+
+<h2 id="linkedin">LinkedIn, TikTok and others</h2>
+<p>Platforms that only release leads to approved apps connect through an automation tool. In Zapier, Make or Pabbly, use the platform's own "new lead" trigger and send the lead to HXG Connect as described below.</p>
+
+<h2 id="zapier">Zapier</h2>
+<ol><li>Add the action <b>Webhooks by Zapier &gt; POST</b>.</li><li>URL = your Zapier address. Payload type <b>json</b>.</li><li>Under Data add <code>name</code>, <code>phone</code>, <code>email</code>, <code>message</code> and map them from the trigger. Test the step: "Lead added" means it worked, and a 422 tells you what's missing.</li></ol>
+
+<h2 id="make">Make</h2>
+<ol><li>Add <b>HTTP &gt; Make a request</b>.</li><li>URL = your Make address, method <b>POST</b>, body type <b>Raw</b>, content type <b>JSON</b>.</li><li>Request content: <code>{"name":"…","phone":"…","email":"…","message":"…"}</code> mapped from earlier modules.</li></ol>
+
+<h2 id="pabbly">Pabbly Connect</h2>
+<ol><li>Add the action <b>API (Pabbly) &gt; Execute custom request</b>.</li><li>Method <b>POST</b>, URL = your Pabbly address, payload type <b>JSON</b>.</li><li>Add parameters <code>name</code>, <code>phone</code>, <code>email</code>, <code>message</code>.</li></ol>
+
+<h2 id="n8n">n8n</h2>
+<ol><li>Add an <b>HTTP Request</b> node: method POST, URL = your n8n address.</li><li>Send body as JSON with <code>name</code>, <code>phone</code>, <code>email</code>, <code>message</code>.</li></ol>
+
+<h2 id="custom">Your own system</h2>
+<p>Use the <b>Any other platform</b> address. POST one lead per request. Add <code>?source=</code> to label where the leads come from, and send your own reference so retries are safe:</p>
+<pre><code>POST /api/webhooks/in/custom/YOUR-KEY?source=broker_app
+Content-Type: application/json
+Idempotency-Key: enquiry-48213
+
+{
+  "name": "Asha Verma",
+  "phone": "+919820012345",
+  "email": "asha@example.com",
+  "city": "Pune",
+  "budget": "85L",
+  "project": "Sunrise Heights",
+  "message": "Wants a site visit on Saturday",
+  "utm_source": "broker_app"
+}</code></pre>
+<p>Systems that can only call a URL can use GET with the same names as query parameters.</p>
+
+<h2 id="code">Code samples</h2>
+<h3>PHP</h3>
+<pre><code>$ch = curl_init('https://yourworkspace.hxgconnect.com/api/webhooks/in/custom/YOUR-KEY');
+curl_setopt_array($ch, [
+  CURLOPT_POST =&gt; true, CURLOPT_RETURNTRANSFER =&gt; true, CURLOPT_TIMEOUT =&gt; 10,
+  CURLOPT_HTTPHEADER =&gt; ['Content-Type: application/json'],
+  CURLOPT_POSTFIELDS =&gt; json_encode(['name' =&gt; $name, 'phone' =&gt; $phone, 'email' =&gt; $email, 'message' =&gt; $message]),
+]);
+$reply = json_decode(curl_exec($ch), true);
+$ok = curl_getinfo($ch, CURLINFO_RESPONSE_CODE) === 200 &amp;&amp; $reply['status'] === 'success';</code></pre>
+<h3>Node.js</h3>
+<pre><code>const res = await fetch('https://yourworkspace.hxgconnect.com/api/webhooks/in/custom/YOUR-KEY', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', 'Idempotency-Key': enquiry.id },
+  body: JSON.stringify({ name: enquiry.name, phone: enquiry.phone, email: enquiry.email, message: enquiry.text }),
+});
+const reply = await res.json();          // { status: 'success', message: 'Lead added' }
+if (!res.ok) throw new Error(reply.message);</code></pre>
+<h3>Python</h3>
+<pre><code>import requests
+r = requests.post(
+    "https://yourworkspace.hxgconnect.com/api/webhooks/in/custom/YOUR-KEY",
+    json={"name": name, "phone": phone, "email": email, "message": message},
+    headers={"Idempotency-Key": enquiry_id}, timeout=10)
+r.raise_for_status()
+print(r.json()["message"])</code></pre>
+
+<h2 id="partners">For platform teams</h2>
+<p>If you run a lead platform and want to offer "Send to HXG Connect" to your customers, this is all you need to build:</p>
+<ol>
+<li><b>A URL field</b> in your customer's settings where they paste their HXG Connect address. Ask them to use the <b>Any other platform</b> address with <code>?source=yourname</code>; tell us and we'll add a named address for your platform so the lead source and setup steps carry your name.</li>
+<li><b>POST each lead as JSON</b> the moment it's created, with at least a name and a mobile number. Use the field names in <a href="#fields">the table</a> if you can; your existing names will very likely be read as they are.</li>
+<li><b>Send a stable reference</b> per lead (<code>lead_id</code> in the body or an <code>Idempotency-Key</code> header).</li>
+<li><b>Treat 200 as delivered.</b> On a timeout or 5xx, retry with the same reference. On 422, don't retry: show your customer the <code>message</code>.</li>
+<li><b>A test button</b> that sends a sample lead. Your customer sees it arrive in HXG Connect's delivery log within seconds.</li>
+</ol>
+<p>No approval, app listing or OAuth is involved. If your platform can only deliver by email, your customers can forward those emails instead: see <a href="#portals">Property portals</a>.</p>
+<p style="color:var(--muted); margin-top:40px; font-size:14px">HXG Connect is a product of HXG Global LLP.</p>
+</main>
+</div>
+<script src="/integration-guide.js" defer></script>
+</body>
+</html>

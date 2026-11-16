@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HXG Connect CRM — Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F6F8; --surface:#FFFFFF; --surface2:#EEF0F3; --ink:#18202B; --ink2:#5B6675;
+  --line:#E2E6EB; --accent:#0E7A6A; --accent-soft:#E2F1EE; --brass:#B07A1E; --brass-soft:#F7EDDB;
+  --red:#C4402F; --red-soft:#FAE7E4; --amber:#B07A1E; --amber-soft:#FBF1DC;
+  --green:#1E8A5B; --green-soft:#E3F3EB; --blue:#2B5DA8; --blue-soft:#E5EDF8;
+  --shadow:0 1px 2px rgba(24,32,43,.05),0 4px 14px rgba(24,32,43,.06);
+  --r:12px;
+}
+[data-theme="dark"]{
+  --bg:#12161C; --surface:#1A2029; --surface2:#232B36; --ink:#EAEEF3; --ink2:#93A0AF;
+  --line:#2A3340; --accent:#3BB79F; --accent-soft:#15332E; --brass:#D9A94E; --brass-soft:#332A16;
+  --red:#E06A5A; --red-soft:#3A1F1B; --amber:#D9A94E; --amber-soft:#33290F;
+  --green:#4CC38A; --green-soft:#12301F; --blue:#6E9FE0; --blue-soft:#1B2A40;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:13.5px;line-height:1.45;transition:background .25s,color .25s}
+h1,h2,h3,.disp{font-family:Archivo,Inter,sans-serif}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+.app{display:flex;height:100vh;overflow:hidden}
+/* ---------- Sidebar ---------- */
+.side{width:216px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:14px 10px}
+.logo{display:flex;align-items:center;gap:9px;padding:6px 10px 16px;font-family:Archivo;font-weight:800;font-size:16px;letter-spacing:-.02em}
+.logo-mark{width:28px;height:28px;border-radius:8px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:14px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:var(--ink2);font-weight:500;text-align:left;width:100%}
+.nav button:hover{background:var(--surface2);color:var(--ink)}
+.nav button.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.nav .ic{width:17px;text-align:center;font-size:14px}
+.nav .cnt{margin-left:auto;font-size:11px;background:var(--surface2);color:var(--ink2);border-radius:20px;padding:1px 7px;font-weight:600}
+.nav button.on .cnt{background:var(--accent);color:#fff}
+.side-foot{margin-top:auto;border-top:1px solid var(--line);padding-top:10px;display:flex;align-items:center;gap:9px;padding-left:6px}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--brass);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;flex-shrink:0}
+.side-foot small{color:var(--ink2)}
+/* ---------- Topbar ---------- */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{height:54px;flex-shrink:0;display:flex;align-items:center;gap:12px;padding:0 20px;background:var(--surface);border-bottom:1px solid var(--line)}
+.search{flex:1;max-width:440px;display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:6px 12px;color:var(--ink2)}
+.search input{border:none;background:none;outline:none;flex:1;color:var(--ink);font:inherit}
+.kbd{font-size:10.5px;border:1px solid var(--line);border-radius:5px;padding:1px 5px;background:var(--surface)}
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.icon-btn{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:var(--ink2);position:relative}
+.icon-btn:hover{background:var(--surface2)}
+.dot{position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--red)}
+.btn{padding:7px 14px;border-radius:9px;font-weight:600;font-size:13px}
+.btn.pri{background:var(--accent);color:#fff}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn.ghost{border:1px solid var(--line);color:var(--ink)}
+.btn.ghost:hover{background:var(--surface2)}
+/* ---------- Content ---------- */
+.content{flex:1;overflow:auto;padding:20px 22px}
+.view{display:none}.view.on{display:block}
+.page-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.page-head h1{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.page-head .sub{color:var(--ink2)}
+.pills{margin-left:auto;display:flex;gap:8px}
+.pill{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:6px 12px;font-weight:500;color:var(--ink2);font-size:12.5px}
+.pill:hover{color:var(--ink)}
+/* ---------- Dashboard ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow)}
+.kpi .lbl{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink2)}
+.kpi .num{font-family:Archivo;font-size:26px;font-weight:700;margin-top:4px;letter-spacing:-.02em}
+.kpi .delta{font-size:11.5px;font-weight:600;margin-top:2px}
+.up{color:var(--green)}.down{color:var(--red)}
+.kpi.alert{border-color:var(--red)}
+.grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-bottom:12px}
+.grid2b{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:900px){.grid2,.grid2b{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)}
+.card h3{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center}
+.card h3 .more{margin-left:auto;font-size:12px;color:var(--accent);font-weight:600;cursor:pointer}
+.funnel-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.funnel-row .fl{width:92px;font-size:12px;color:var(--ink2);flex-shrink:0}
+.funnel-row .bar{height:22px;border-radius:6px;background:var(--accent);opacity:.92;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:#fff;font-size:11px;font-weight:700;min-width:34px}
+.src{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.src .sw{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.src .nm{flex:1}
+.src .pc{font-weight:700}
+.src .track{flex:2;height:7px;border-radius:5px;background:var(--surface2);overflow:hidden}
+.src .fill{height:100%;border-radius:5px}
+.lb-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.lb-row:last-child{border:none}
+.lb-rank{font-family:Archivo;font-weight:800;color:var(--ink2);width:18px}
+.lb-row .stats{margin-left:auto;color:var(--ink2);font-size:12px}
+.lb-row .rev{font-weight:700;color:var(--brass)}
+.myday-item{display:flex;gap:10px;padding:9px 10px;border-radius:9px;border:1px solid var(--line);margin-bottom:8px;align-items:center}
+.myday-item.overdue{border-color:var(--red);background:var(--red-soft)}
+.myday-time{font-family:Archivo;font-weight:700;font-size:12px;width:52px;flex-shrink:0}
+.myday-item .what{flex:1}.myday-item .what small{color:var(--ink2);display:block}
+.chip{font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 7px;letter-spacing:.03em}
+.chip.red{background:var(--red-soft);color:var(--red)}
+.chip.green{background:var(--green-soft);color:var(--green)}
+.chip.amber{background:var(--amber-soft);color:var(--amber)}
+.chip.blue{background:var(--blue-soft);color:var(--blue)}
+.chip.teal{background:var(--accent-soft);color:var(--accent)}
+/* ---------- Leads table ---------- */
+.toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.table-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:auto;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;min-width:820px}
+th{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink2);text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);font-weight:600;background:var(--surface)}
+td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--surface2)}
+tbody tr:last-child td{border:none}
+.lead-name{font-weight:600;display:flex;align-items:center;gap:7px}
+.stale{width:7px;height:7px;border-radius:50%;background:var(--red);flex-shrink:0}
+td .sub{color:var(--ink2);font-size:12px}
+.own{display:flex;align-items:center;gap:7px}
+.own .avatar{width:24px;height:24px;font-size:10px}
+/* ---------- Kanban ---------- */
+.board{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px;align-items:flex-start}
+.col{width:236px;flex-shrink:0;background:var(--surface2);border-radius:var(--r);padding:10px}
+.col-head{display:flex;align-items:center;gap:7px;margin-bottom:10px;padding:0 4px}
+.col-head .cname{font-family:Archivo;font-weight:700;font-size:12px;letter-spacing:.04em;text-transform:uppercase}
+.col-head .ccount{font-size:11px;font-weight:700;color:var(--ink2)}
+.col-head .cval{margin-left:auto;font-size:11px;color:var(--brass);font-weight:700}
+.kcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow);cursor:grab}
+.kcard:active{cursor:grabbing}
+.kcard.dragging{opacity:.45;transform:rotate(2deg)}
+.kcard .kn{font-weight:600;display:flex;align-items:center;gap:6px}
+.kcard .kb{color:var(--brass);font-weight:700;font-size:12.5px;margin:3px 0}
+.kcard .kf{display:flex;align-items:center;gap:6px;margin-top:6px}
+.kcard .kf .avatar{width:20px;height:20px;font-size:9px}
+.kcard .kf small{color:var(--ink2)}
+.kcard .age{margin-left:auto;font-size:10.5px;color:var(--ink2)}
+.kcard .age.hot{color:var(--red);font-weight:700}
+.col.dragover{outline:2px dashed var(--accent);outline-offset:-2px}
+/* ---------- Lead detail ---------- */
+.detail{display:grid;grid-template-columns:1.5fr 1fr;gap:12px}
+@media(max-width:900px){.detail{grid-template-columns:1fr}}
+.back{color:var(--accent);font-weight:600;margin-bottom:10px;display:inline-block}
+.lead-hero{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.lead-hero .row1{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.lead-hero h2{font-size:18px;letter-spacing:-.02em}
+.hero-actions{margin-left:auto;display:flex;gap:8px}
+.act{width:36px;height:36px;border-radius:9px;display:grid;place-items:center;font-size:15px;border:1px solid var(--line)}
+.act:hover{background:var(--surface2)}
+.act.call{background:var(--accent);color:#fff;border:none}
+.meta-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;color:var(--ink2);font-size:12.5px}
+.meta-row b{color:var(--ink)}
+.tl-item{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.tl-item:last-child{border:none}
+.tl-ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex-shrink:0;font-size:13px}
+.tl-item .tt{font-weight:600}
+.tl-item .ts{color:var(--ink2);font-size:12px}
+.tl-item .tn{margin-top:3px;font-size:12.5px;color:var(--ink2);font-style:italic}
+.play{display:inline-flex;align-items:center;gap:6px;margin-top:6px;background:var(--surface2);border-radius:20px;padding:4px 12px 4px 6px;font-size:11.5px;font-weight:600}
+.play .pb{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:10px}
+.wave{display:inline-flex;gap:2px;align-items:center;height:14px}
+.wave i{width:2px;background:var(--ink2);border-radius:2px;display:inline-block}
+.side-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.side-card h4{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink2);margin-bottom:10px}
+.na{display:flex;align-items:center;gap:10px;border:1px solid var(--amber);background:var(--amber-soft);border-radius:10px;padding:10px 12px}
+.na b{display:block}
+.na small{color:var(--ink2)}
+.na .btn{margin-left:auto;padding:5px 11px;font-size:12px}
+.kv{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line);font-size:12.5px}
+.kv:last-child{border:none}
+.kv span{color:var(--ink2)}
+.match{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.match:last-child{border:none}
+.match .u{font-weight:700;font-family:Archivo}
+.match .btn{margin-left:auto;padding:4px 10px;font-size:11.5px}
+/* ---------- Inventory ---------- */
+.legend{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap;font-size:12px;color:var(--ink2)}
+.legend .sw{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:-1px}
+.tower{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);overflow:auto}
+.floor{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.fl-lbl{width:36px;font-size:11px;font-weight:700;color:var(--ink2);font-family:Archivo;flex-shrink:0}
+.unit{width:82px;height:44px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;border:1px solid transparent;transition:transform .12s;flex-shrink:0}
+.unit small{font-weight:500;font-size:9.5px;opacity:.8}
+.unit:hover{transform:translateY(-2px)}
+.u-avail{background:var(--green-soft);color:var(--green);border-color:var(--green)}
+.u-hold{background:var(--amber-soft);color:var(--amber);border-color:var(--amber)}
+.u-booked{background:var(--red-soft);color:var(--red);border-color:var(--red)}
+.u-sold{background:var(--surface2);color:var(--ink2);border-color:var(--line)}
+.unit.sel{outline:2px solid var(--accent);outline-offset:2px}
+.udrawer{margin-top:14px;border-top:1px solid var(--line);padding-top:14px;display:none}
+.udrawer.on{display:block}
+.udrawer .u-title{font-family:Archivo;font-weight:800;font-size:16px}
+.udrawer .u-meta{color:var(--ink2);margin:4px 0 12px}
+.udrawer .price{font-family:Archivo;font-weight:800;font-size:20px;color:var(--brass)}
+/* ---------- Field team ---------- */
+.field-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:12px}
+@media(max-width:980px){.field-grid{grid-template-columns:1fr}}
+.map{position:relative;border-radius:var(--r);overflow:hidden;border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow)}
+.map svg{display:block;width:100%;height:auto}
+.pin{position:absolute;transform:translate(-50%,-100%);text-align:center;cursor:pointer;transition:transform .15s}
+.pin:hover{transform:translate(-50%,-100%) scale(1.08)}
+.pin .pface{width:38px;height:38px;border-radius:50%;border:3px solid var(--surface);box-shadow:0 2px 8px rgba(0,0,0,.3);display:grid;place-items:center;font-weight:800;color:#fff;font-size:12px;margin:0 auto}
+.pin .ptail{width:3px;height:9px;background:var(--ink);margin:0 auto;border-radius:2px;opacity:.5}
+.pin .plbl{font-size:10px;font-weight:700;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1px 6px;margin-top:2px;white-space:nowrap}
+.pulse{position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--accent);animation:pl 1.8s infinite;pointer-events:none}
+@keyframes pl{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.5);opacity:0}}
+.op-row{display:flex;gap:11px;padding:10px;border:1px solid var(--line);border-radius:11px;margin-bottom:9px;align-items:center;background:var(--surface)}
+.op-row.flagged{border-color:var(--amber);background:var(--amber-soft)}
+.selfie{width:44px;height:44px;border-radius:11px;display:grid;place-items:center;font-size:21px;flex-shrink:0;border:2px solid var(--line);position:relative;background:var(--surface2)}
+.selfie::after{content:'📷';position:absolute;bottom:-5px;right:-5px;font-size:10px;background:var(--surface);border:1px solid var(--line);border-radius:50%;width:16px;height:16px;display:grid;place-items:center}
+.op-row .oinfo{flex:1;min-width:0}
+.op-row .oinfo b{display:block}
+.op-row .oinfo small{color:var(--ink2);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.op-status{text-align:right;flex-shrink:0}
+.op-status small{display:block;color:var(--ink2);font-size:10.5px;margin-top:3px}
+/* phone simulator */
+.phone{width:250px;margin:0 auto;border:1px solid var(--line);border-radius:26px;background:var(--bg);padding:12px 12px 16px;box-shadow:var(--shadow)}
+.phone .notch{width:70px;height:5px;border-radius:4px;background:var(--line);margin:0 auto 12px}
+.camera{height:180px;border-radius:16px;background:linear-gradient(160deg,var(--surface2),var(--accent-soft));display:grid;place-items:center;position:relative;overflow:hidden;border:1px solid var(--line)}
+.camera .face{font-size:64px;transition:transform .3s}
+.camera .frame{position:absolute;inset:24px;border:2px dashed var(--accent);border-radius:14px;opacity:.6}
+.camera .flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+.camera.snap .flash{animation:fl .35s}
+@keyframes fl{0%{opacity:.95}100%{opacity:0}}
+.geo-line{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--ink2);margin:10px 2px}
+.geo-line b{color:var(--ink)}
+.phone .btn{width:100%;justify-content:center;display:flex;padding:10px;border-radius:12px}
+.step-done{color:var(--green);font-weight:700}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:10px;font-weight:600;font-size:13px;transition:transform .3s;z-index:50;box-shadow:var(--shadow)}
+.toast.on{transform:translateX(-50%) translateY(0)}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}
+@media(max-width:760px){.side{width:60px}.side .lt,.side .cnt,.logo span,.side-foot div{display:none}.nav button{justify-content:center}.content{padding:14px}}
+</style>
+</head>
+<body data-theme="light">
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="side">
+    <div class="logo"><div class="logo-mark">◫</div><span>HXG Connect</span></div>
+    <nav class="nav" id="nav">
+      <button data-v="dash" class="on"><span class="ic">▦</span><span class="lt">Dashboard</span></button>
+      <button data-v="leads"><span class="ic">◉</span><span class="lt">Leads</span><span class="cnt">412</span></button>
+      <button data-v="pipe"><span class="ic">☷</span><span class="lt">Pipeline</span></button>
+      <button data-v="calls"><span class="ic">✆</span><span class="lt">Calls</span><span class="cnt">4</span></button>
+      <button data-v="inbox"><span class="ic">⌾</span><span class="lt">Inbox</span><span class="cnt">9</span></button>
+      <button data-v="visits"><span class="ic">📍</span><span class="lt">Site Visits</span></button>
+      <button data-v="field"><span class="ic">🧭</span><span class="lt">Field Team</span><span class="cnt">5</span></button>
+      <button data-v="inv"><span class="ic">▤</span><span class="lt">Inventory</span></button>
+      <button data-v="book"><span class="ic">✓</span><span class="lt">Bookings</span></button>
+      <button data-v="reports"><span class="ic">◔</span><span class="lt">Reports</span></button>
+      <button data-v="admin"><span class="ic">⚙</span><span class="lt">Admin</span></button>
+      <button data-v="platform" style="margin-top:8px;border-top:1px solid var(--line);border-radius:0 0 9px 9px;padding-top:12px"><span class="ic">◈</span><span class="lt">Platform <small style="opacity:.6">(Super Admin)</small></span></button>
+    </nav>
+    <div class="side-foot">
+      <div class="avatar">PS</div>
+      <div><div style="font-weight:600;font-size:12.5px">Priya Sharma</div><small>Telecaller · Team A</small></div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <!-- Topbar -->
+    <header class="top">
+      <div class="search">🔍 <input placeholder="Search leads, contacts, units, documents…"><span class="kbd">⌘K</span></div>
+      <div class="top-actions">
+        <button class="icon-btn" id="themeBtn" title="Toggle dark mode">◐</button>
+        <button class="icon-btn" title="Notifications">🔔<span class="dot"></span></button>
+        <button class="btn pri" onclick="toast('Quick-add lead — capture form opens here')">＋ New Lead</button>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- ================= DASHBOARD ================= -->
+      <section class="view on" id="v-dash">
+        <div class="page-head">
+          <h1>Good morning, Priya</h1><span class="sub">Monday, 6 July · 21 follow-ups today</span>
+          <div class="pills"><button class="pill">Project: All ▾</button><button class="pill">This week ▾</button></div>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="lbl">New Leads</div><div class="num">34</div><div class="delta up">▲ 12% vs last wk</div></div>
+          <div class="kpi"><div class="lbl">Today's Calls</div><div class="num">58</div><div class="delta up">▲ connect 71%</div></div>
+          <div class="kpi"><div class="lbl">Follow-ups</div><div class="num">21</div><div class="delta down">3 overdue</div></div>
+          <div class="kpi alert"><div class="lbl">Missed Calls</div><div class="num">4</div><div class="delta down">needs callback</div></div>
+          <div class="kpi"><div class="lbl">Site Visits</div><div class="num">7</div><div class="delta up">▲ 2 revisits</div></div>
+          <div class="kpi"><div class="lbl">Bookings · Wk</div><div class="num">3</div><div class="delta up" style="color:var(--brass)">₹2.4 Cr booked</div></div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <h3>Sales Funnel <span class="more">View report →</span></h3>
+            <div id="funnel"></div>
+          </div>
+          <div class="card">
+            <h3>Lead Sources <span class="more">ROI →</span></h3>
+            <div id="sources"></div>
+          </div>
+        </div>
+        <div class="grid2b">
+          <div class="card">
+            <h3>Team Leaderboard · July <span class="more">All →</span></h3>
+            <div class="lb-row"><span class="lb-rank">1</span><div class="avatar" style="background:var(--accent)">AR</div><div><b>Arjun Rao</b><br><small style="color:var(--ink2)">Field · Sunrise Heights</small></div><div class="stats">12 visits · 2 bookings · <span class="rev">₹1.7 Cr</span></div></div>
+            <div class="lb-row"><span class="lb-rank">2</span><div class="avatar">PS</div><div><b>Priya Sharma</b><br><small style="color:var(--ink2)">Telecaller · Team A</small></div><div class="stats">142 calls · 9 visits · <span class="rev">₹0.7 Cr</span></div></div>
+            <div class="lb-row"><span class="lb-rank">3</span><div class="avatar" style="background:var(--blue)">MK</div><div><b>Meera Kulkarni</b><br><small style="color:var(--ink2)">Field · Vista One</small></div><div class="stats">8 visits · 1 booking · <span class="rev">₹0.6 Cr</span></div></div>
+          </div>
+          <div class="card">
+            <h3>My Day <span class="more">Full queue →</span></h3>
+            <div class="myday-item overdue"><span class="myday-time">2h late</span><div class="what"><b>Call Rohit Mehra</b><small>Promised callback · Qualified · ₹80–95L</small></div><span class="chip red">OVERDUE</span></div>
+            <div class="myday-item"><span class="myday-time">11:00</span><div class="what"><b>Site visit — Sunrise Heights</b><small>Anita Shah with Arjun · confirm at 9:30</small></div><span class="chip teal">VISIT</span></div>
+            <div class="myday-item"><span class="myday-time">16:00</span><div class="what"><b>WhatsApp cost sheet</b><small>Vikram Joshi · unit T2-1103 held till Wed</small></div><span class="chip amber">HOLD ⏳</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= LEADS ================= -->
+      <section class="view" id="v-leads">
+        <div class="page-head"><h1>Leads</h1><span class="sub">412 open · saved view: <b>Hot FB Leads</b></span>
+          <div class="pills"><button class="pill">⇪ Import</button><button class="pill">⇩ Export</button></div>
+        </div>
+        <div class="toolbar">
+          <button class="pill">Stage ▾</button><button class="pill">Owner: Me ▾</button><button class="pill">Source ▾</button><button class="pill">Budget ▾</button><button class="pill">＋ Filter</button>
+          <span style="margin-left:auto;color:var(--ink2);font-size:12px">2 selected —</span>
+          <button class="pill">Assign</button><button class="pill">Tag</button><button class="pill">⌾ WhatsApp</button>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th></th><th>Lead</th><th>Stage</th><th>Budget</th><th>Source</th><th>Next follow-up</th><th>Owner</th></tr></thead>
+          <tbody id="leadRows"></tbody>
+        </table></div>
+      </section>
+
+      <!-- ================= LEAD DETAIL ================= -->
+      <section class="view" id="v-detail">
+        <a class="back" href="#" onclick="go('leads');return false">← Back to leads</a>
+        <div class="lead-hero">
+          <div class="row1">
+            <div class="avatar" style="width:42px;height:42px;font-size:15px;background:var(--accent)">RM</div>
+            <div><h2>Rohit Mehra</h2><small style="color:var(--ink2)">+91 98765 43210 · rohit.m@gmail.com · WhatsApp ✓</small></div>
+            <span class="chip teal">QUALIFIED</span>
+            <div class="hero-actions">
+              <button class="act call" onclick="toast('Click-to-call: bridging via Exotel…')">✆</button>
+              <button class="act" onclick="toast('WhatsApp thread opened')">⌾</button>
+              <button class="act" onclick="toast('Compose email')">✉</button>
+              <button class="act" onclick="toast('More: merge · reassign · export')">⋮</button>
+            </div>
+          </div>
+          <div class="meta-row">
+            <span>Budget <b>₹80–95L</b></span><span>Wants <b>3BHK · East facing</b></span>
+            <span>Location <b>Indirapuram</b></span><span>Source <b>Facebook / sunrise-jul</b></span>
+            <span>Tags <span class="chip blue">NRI</span> <span class="chip amber">3BHK</span></span>
+          </div>
+        </div>
+        <div class="detail">
+          <div class="card">
+            <h3>Timeline</h3>
+            <div class="tl-item"><div class="tl-ic" style="background:var(--accent-soft);color:var(--accent)">✆</div>
+              <div style="flex:1"><div class="tt">Outgoing call · 3m 12s <span class="chip green">CONNECTED</span></div>
+              <div class="ts">Today 10:12 · Priya Sharma · Exotel</div>
+              <div class="tn">"Wants a corner unit, will visit Saturday with wife."</div>
+              <div class="play"><span class="pb">▶</span><span class="wave" id="wave"></span><span>3:12</span></div></div></div>
+            <div class="tl-item"><div class="tl-ic" style="background:var(--green-soft);color:var(--green)">⌾</div>
+              <div><div class="tt">WhatsApp · brochure template sent</div><div class="ts">Yesterday 18:40 · delivered ✓✓ read</div></div></div>
+            <div class="tl-item"><div class="tl-ic" style="background:var(--blue-soft);color:var(--blue)">⇢</div>
+              <div><div class="tt">Stage changed: Contacted → Qualified</div><div class="ts">Mon 12:05 · Priya Sharma</div></div></div>
+            <div class="tl-item"><div class="tl-ic" style="background:var(--amber-soft);color:var(--amber)">◉</div>
+              <div><div class="tt">Lead created & auto-assigned</div><div class="ts">Mon 11:58 · rule: fb-sunrise-round-robin · responded in 4 min</div></div></div>
+          </div>
+          <div>
+            <div class="side-card"><h4>Next action</h4>
+              <div class="na">✆<div><b>Call — today 4:00 pm</b><small>Confirm Saturday site visit</small></div>
+              <button class="btn pri" onclick="toast('Done ✓ — schedule the next follow-up (required)')">Done</button></div>
+            </div>
+            <div class="side-card"><h4>Details</h4>
+              <div class="kv"><span>Property type</span><b>Apartment</b></div>
+              <div class="kv"><span>Possession timeline</span><b>Under construction OK</b></div>
+              <div class="kv"><span>Loan required</span><b>Yes — HDFC pre-approved</b></div>
+              <div class="kv"><span>Lead score</span><b style="color:var(--accent)">78 / 100 🔥</b></div>
+            </div>
+            <div class="side-card"><h4>Matching inventory</h4>
+              <div class="match"><div><div class="u">T2-1204 · 3BHK</div><small style="color:var(--ink2)">1450 sf · East · Sunrise Heights</small></div><b style="color:var(--brass)">₹86.2L</b><button class="btn ghost" onclick="toast('Cost sheet shared on WhatsApp (tracked link)')">Share</button></div>
+              <div class="match"><div><div class="u">T1-0902 · 3BHK</div><small style="color:var(--ink2)">1420 sf · Park view</small></div><b style="color:var(--brass)">₹83.9L</b><button class="btn ghost" onclick="toast('Cost sheet shared on WhatsApp (tracked link)')">Share</button></div>
+            </div>
+            <div class="side-card"><h4>Documents</h4>
+              <div class="kv"><span>📄 KYC_Rohit.pdf</span><b>2.1 MB</b></div>
+              <div class="kv"><span>📄 CostSheet_T2-1204_v2.pdf</span><b>410 KB</b></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= PIPELINE ================= -->
+      <section class="view" id="v-pipe">
+        <div class="page-head"><h1>Pipeline</h1><span class="sub">Sunrise Heights · drag cards between stages</span>
+          <div class="pills"><button class="pill">Pipeline ▾</button><button class="pill">Swimlanes ▾</button><button class="pill">Filter</button></div>
+        </div>
+        <div class="board" id="board"></div>
+      </section>
+
+      <!-- ================= INVENTORY ================= -->
+      <section class="view" id="v-inv">
+        <div class="page-head"><h1>Inventory</h1><span class="sub">Sunrise Heights · Tower T2 · 48 units</span>
+          <div class="pills"><button class="pill">Project ▾</button><button class="pill">Tower T2 ▾</button><button class="pill">⇩ Availability report</button></div>
+        </div>
+        <div class="legend">
+          <span><span class="sw" style="background:var(--green)"></span>Available</span>
+          <span><span class="sw" style="background:var(--amber)"></span>On hold</span>
+          <span><span class="sw" style="background:var(--red)"></span>Booked</span>
+          <span><span class="sw" style="background:var(--ink2)"></span>Sold</span>
+        </div>
+        <div class="tower">
+          <div id="towerGrid"></div>
+          <div class="udrawer" id="udrawer">
+            <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
+              <div style="flex:1;min-width:200px">
+                <div class="u-title" id="uTitle">T2-1204 · 3BHK</div>
+                <div class="u-meta" id="uMeta">1450 sf super · East facing · corner unit · 2 parking</div>
+                <div class="price" id="uPrice">₹86.2 L</div>
+                <small style="color:var(--ink2)">Base ₹82.4L + PLC ₹2.3L + floor rise ₹1.5L · CLP plan</small>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <button class="btn ghost" onclick="toast('Unit held for 48h against lead Rohit Mehra')">Hold 48h</button>
+                <button class="btn ghost" onclick="toast('Cost sheet PDF generated & shared')">Share cost sheet</button>
+                <button class="btn pri" onclick="toast('Booking form opened — unit will auto-lock')">Book unit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= FIELD TEAM ================= -->
+      <section class="view" id="v-field">
+        <div class="page-head"><h1>Field Team</h1><span class="sub">Manager view · 5 operators · live since day-start check-in</span>
+          <div class="pills"><button class="pill">Team: All ▾</button><button class="pill">⇩ Attendance register</button></div>
+        </div>
+        <div class="field-grid">
+          <div>
+            <div class="map" id="fieldMap">
+              <svg viewBox="0 0 640 380" xmlns="http://www.w3.org/2000/svg">
+                <rect width="640" height="380" fill="var(--surface2)"/>
+                <rect x="60" y="40" width="150" height="110" rx="10" fill="var(--green-soft)"/>
+                <text x="135" y="100" text-anchor="middle" font-size="11" fill="var(--green)" font-family="Inter">City Park</text>
+                <rect x="430" y="230" width="160" height="110" rx="10" fill="var(--blue-soft)"/>
+                <text x="510" y="290" text-anchor="middle" font-size="11" fill="var(--blue)" font-family="Inter">Sunrise Heights (site)</text>
+                <path d="M0 200 H640" stroke="var(--surface)" stroke-width="18"/>
+                <path d="M0 200 H640" stroke="var(--line)" stroke-width="1" stroke-dasharray="8 8"/>
+                <path d="M300 0 V380" stroke="var(--surface)" stroke-width="14"/>
+                <path d="M80 380 Q200 260 300 200" stroke="var(--surface)" stroke-width="10" fill="none"/>
+                <path d="M300 200 Q450 160 640 90" stroke="var(--surface)" stroke-width="10" fill="none"/>
+                <text x="12" y="192" font-size="10" fill="var(--ink2)" font-family="Inter">NH-24</text>
+              </svg>
+              <div class="pin" style="left:76%;top:72%" onclick="toast('Arjun Rao — checked in at Sunrise Heights, 10:42 · GPS ±8m')"><div class="pface" style="background:var(--accent)">AR<span class="pulse"></span></div><div class="ptail"></div><div class="plbl">Arjun · in visit</div></div>
+              <div class="pin" style="left:38%;top:38%" onclick="toast('Meera Kulkarni — en route, last ping 4 min ago')"><div class="pface" style="background:var(--blue)">MK</div><div class="ptail"></div><div class="plbl">Meera · en route</div></div>
+              <div class="pin" style="left:22%;top:64%" onclick="toast('Kunal Verma — day started 9:04, Vaishali office')"><div class="pface" style="background:var(--brass)">KV</div><div class="ptail"></div><div class="plbl">Kunal · idle 38m</div></div>
+              <div class="pin" style="left:57%;top:22%" onclick="toast('Sana Iqbal — client meeting check-in 11:15 · GPS ±11m')"><div class="pface" style="background:#7A4FB0">SI</div><div class="ptail"></div><div class="plbl">Sana · meeting</div></div>
+            </div>
+            <div class="card" style="margin-top:12px">
+              <h3>Today's check-in feed <span class="more">Review queue (1) →</span></h3>
+              <div id="fieldFeed">
+                <div class="op-row flagged"><div class="selfie">🧔</div>
+                  <div class="oinfo"><b>Kunal Verma · Day start</b><small>9:04 am · Vaishali Sec-4 · GPS ±210m</small></div>
+                  <div class="op-status"><span class="chip amber">FLAGGED · LOW ACCURACY</span><small><button class="pill" style="padding:2px 9px" onclick="toast('Check-in approved with note')">Approve</button></small></div></div>
+                <div class="op-row"><div class="selfie">👩</div>
+                  <div class="oinfo"><b>Sana Iqbal · Client meeting</b><small>11:15 am · Indirapuram, Ahinsa Khand · GPS ±11m</small></div>
+                  <div class="op-status"><span class="chip green">VERIFIED ✓</span><small>selfie + GPS auto-sent</small></div></div>
+                <div class="op-row"><div class="selfie">🧑</div>
+                  <div class="oinfo"><b>Arjun Rao · Site visit check-in</b><small>10:42 am · Sunrise Heights gate · geo-fence ✓ · GPS ±8m</small></div>
+                  <div class="op-status"><span class="chip green">VERIFIED ✓</span><small>linked to Anita Shah visit</small></div></div>
+                <div class="op-row"><div class="selfie">👩‍🦱</div>
+                  <div class="oinfo"><b>Meera Kulkarni · Day start</b><small>8:58 am · Vista One office · GPS ±9m</small></div>
+                  <div class="op-status"><span class="chip green">VERIFIED ✓</span><small>on time</small></div></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:12px">
+              <h3>Operator app — check-in flow (try it)</h3>
+              <div class="phone">
+                <div class="notch"></div>
+                <div class="camera" id="cam"><div class="frame"></div><div class="face" id="face">🙂</div><div class="flash"></div></div>
+                <div class="geo-line">🤳 <span id="stepSelfie">Front camera only — no gallery uploads</span></div>
+                <div class="geo-line">📍 <span id="stepGeo">GPS: <b>28.667° N, 77.372° E</b> · ±9m · Indirapuram</span></div>
+                <div class="geo-line">🕐 <span>Device time <b>12:31 pm</b> · device verified ✓</span></div>
+                <button class="btn pri" id="checkinBtn">📸 Take selfie & check in</button>
+                <div style="font-size:10.5px;color:var(--ink2);text-align:center;margin-top:9px">Selfie + location auto-submit to your manager.<br>Tracking runs only between day-start and day-end.</div>
+              </div>
+            </div>
+            <div class="card">
+              <h3>Attendance today</h3>
+              <div class="kv"><span>Checked in</span><b class="step-done">5 / 6 operators</b></div>
+              <div class="kv"><span>Missing day-start</span><b style="color:var(--red)">Ravi T. — reminder sent 10:00</b></div>
+              <div class="kv"><span>Avg field hours (wk)</span><b>6.8 h/day</b></div>
+              <div class="kv"><span>Check-in compliance</span><b>94%</b></div>
+              <div class="kv"><span>Flagged this week</span><b>3 (2 approved)</b></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= PLATFORM / SUPER ADMIN ================= -->
+      <section class="view" id="v-platform">
+        <div class="page-head"><h1>Platform Console</h1><span class="sub">Super Admin · admin.hxgconnect.com — separate realm from client apps</span>
+          <div class="pills"><button class="pill" onclick="toast('Plan builder: price, limits, feature matrix')">Plans</button><button class="pill" onclick="toast('Platform admins: Sales/CS · Support · Billing roles')">Platform Admins</button><button class="btn pri" style="font-size:12.5px" onclick="toast('New client provisioned: subdomain live, defaults seeded, owner invited — under 30s')">＋ New Client</button></div>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="lbl">MRR</div><div class="num" style="color:var(--brass)">₹8.4L</div><div class="delta up">▲ 11% MoM</div></div>
+          <div class="kpi"><div class="lbl">Active Clients</div><div class="num">47</div><div class="delta up">▲ 4 this month</div></div>
+          <div class="kpi"><div class="lbl">Trials</div><div class="num">12</div><div class="delta up">31% convert</div></div>
+          <div class="kpi alert"><div class="lbl">Past Due</div><div class="num">3</div><div class="delta down">dunning active</div></div>
+          <div class="kpi"><div class="lbl">Churn · Qtr</div><div class="num">2.1%</div><div class="delta up">▼ 0.6pt</div></div>
+          <div class="kpi"><div class="lbl">Total Seats</div><div class="num">612</div><div class="delta up">₹1,370 ARPA</div></div>
+        </div>
+        <div class="toolbar">
+          <button class="pill">Status ▾</button><button class="pill">Plan ▾</button><button class="pill">Health ▾</button><button class="pill">Renewal month ▾</button>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Client</th><th>Plan</th><th>Status</th><th>Users</th><th>Leads</th><th>Usage</th><th>MRR</th><th>Health</th><th></th></tr></thead>
+          <tbody id="tenantRows"></tbody>
+        </table></div>
+        <div class="grid2b" style="margin-top:12px">
+          <div class="card"><h3>Tenant health alerts <span class="more">Ops queue →</span></h3>
+            <div class="myday-item overdue"><span class="myday-time">2h</span><div class="what"><b>Sunrise Realty — WhatsApp token expiring</b><small>Meta Cloud API · renew in client integrations</small></div><span class="chip red">ACTION</span></div>
+            <div class="myday-item"><span class="myday-time">Today</span><div class="what"><b>MetroHomes — webhook failures (Exotel)</b><small>412 events dead-lettered · auth error 401</small></div><span class="chip amber">RETRYING</span></div>
+            <div class="myday-item"><span class="myday-time">Wk</span><div class="what"><b>Vertex Estates — login decline 38%</b><small>churn-risk signal → CS task created</small></div><span class="chip amber">CHURN RISK</span></div>
+          </div>
+          <div class="card"><h3>Impersonation log (audited) <span class="more">All →</span></h3>
+            <div class="lb-row"><div class="avatar" style="background:var(--blue)">RS</div><div><b>Rahul (Support) → GreenAcre Builders</b><br><small style="color:var(--ink2)">Reason: report export bug · read-only · 41 min</small></div><div class="stats"><span class="chip green">CLIENT APPROVED</span></div></div>
+            <div class="lb-row"><div class="avatar" style="background:var(--blue)">RS</div><div><b>Rahul (Support) → MetroHomes</b><br><small style="color:var(--ink2)">Requested 10:20 · awaiting client-admin approval</small></div><div class="stats"><span class="chip amber">PENDING</span></div></div>
+            <div style="font-size:11.5px;color:var(--ink2);margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)">Every session is time-boxed (60 min), consent-gated, and written to both platform & tenant audit logs with both identities.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= STUBS ================= -->
+      <section class="view" id="v-calls"><div class="page-head"><h1>Calls</h1><span class="sub">prototype stub — full spec in the design docs</span></div>
+        <div class="card">Call center view: live call bar, today's queue, missed-call callbacks, disposition drill-down, recordings with playback & audit, connect-rate analytics per user. Providers: Exotel · Knowlarity · MyOperator · Twilio · SIP.</div></section>
+      <section class="view" id="v-inbox"><div class="page-head"><h1>Inbox</h1><span class="sub">prototype stub</span></div>
+        <div class="card">Unified WhatsApp / SMS / Email threads mapped to leads, template picker with approval status, shared team assignment, SLA timers.</div></section>
+      <section class="view" id="v-visits"><div class="page-head"><h1>Site Visits</h1><span class="sub">prototype stub</span></div>
+        <div class="card">Today's visit schedule per executive, GPS check-in map, feedback scores, visit→booking conversion funnel, no-show follow-ups.</div></section>
+      <section class="view" id="v-book"><div class="page-head"><h1>Bookings</h1><span class="sub">prototype stub</span></div>
+        <div class="card">Booking register, demand schedules, collections ageing, Razorpay links, cancellation workflow, Tally sync queue.</div></section>
+      <section class="view" id="v-reports"><div class="page-head"><h1>Reports</h1><span class="sub">prototype stub</span></div>
+        <div class="card">Lead sources · Sales performance · Call reports · Follow-up compliance · Visits · Bookings · Revenue · Marketing ROI · Lost reasons — all exportable to XLSX / CSV / PDF, all drillable to leads.</div></section>
+      <section class="view" id="v-admin"><div class="page-head"><h1>Admin</h1><span class="sub">prototype stub</span></div>
+        <div class="card">Users & roles, permission matrix, assignment rules builder, custom fields, integrations (telephony, WhatsApp, payments, calendar), audit log, data import/export.</div></section>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------- nav ----------
+const views=['dash','leads','detail','pipe','inv','field','calls','inbox','visits','book','reports','admin','platform'];
+function go(v){
+  views.forEach(x=>document.getElementById('v-'+x).classList.toggle('on',x===v));
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v||(v==='detail'&&b.dataset.v==='leads')));
+  document.querySelector('.content').scrollTop=0;
+}
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
+
+// ---------- theme ----------
+document.getElementById('themeBtn').onclick=()=>{
+  const b=document.body; b.dataset.theme=b.dataset.theme==='light'?'dark':'light';
+};
+
+// ---------- toast ----------
+let tt;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2400);}
+
+// ---------- dashboard: funnel ----------
+const funnel=[['New',412],['Contacted',298],['Qualified',176],['Site Visit',88],['Negotiation',31],['Booked',14]];
+document.getElementById('funnel').innerHTML=funnel.map(([l,n],i)=>
+ `<div class="funnel-row"><span class="fl">${l}</span><div class="bar" style="width:${(n/412*100).toFixed(0)}%;opacity:${1-i*.1}">${n}</div></div>`).join('');
+
+// ---------- dashboard: sources ----------
+const srcs=[['Facebook',38,'#0E7A6A'],['Google Ads',24,'#2B5DA8'],['Portals',18,'#B07A1E'],['Channel Partners',12,'#7A4FB0'],['Walk-in / Referral',8,'#C4402F']];
+document.getElementById('sources').innerHTML=srcs.map(([n,p,c])=>
+ `<div class="src"><span class="sw" style="background:${c}"></span><span class="nm">${n}</span><div class="track"><div class="fill" style="width:${p}%;background:${c}"></div></div><span class="pc">${p}%</span></div>`).join('')
+ +`<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:12px;color:var(--ink2)">Best CPL this month: <b style="color:var(--ink)">Google Ads ₹412/lead</b> · Best visit-rate: <b style="color:var(--ink)">Channel Partners 31%</b></div>`;
+
+// ---------- leads table ----------
+const leads=[
+ ['RM','Rohit Mehra',true,'Qualified','teal','₹80–95L','Facebook','⚠ 2h overdue',1,'Priya','PS','var(--brass)'],
+ ['AS','Anita Shah',false,'Site Visit','blue','₹1.2 Cr','CP · Ravi Assoc.','Sat 11:00',0,'Arjun','AR','var(--accent)'],
+ ['VJ','Vikram Joshi',false,'Negotiation','amber','₹86L','Google Ads','Today 16:00',0,'Priya','PS','var(--brass)'],
+ ['SK','Sanjay Kapoor',false,'Contacted','green','₹55–60L','Portal · 99acres','Tomorrow 10:30',0,'Meera','MK','var(--blue)'],
+ ['NG','Neha Gupta',true,'New Lead','red','₹70L','QR · Expo booth','Unassigned ⚠',1,'—','?','var(--ink2)'],
+ ['FD','Farhan D’souza',false,'Qualified','teal','₹95L–1.1Cr','Website','Wed 12:00',0,'Arjun','AR','var(--accent)'],
+];
+document.getElementById('leadRows').innerHTML=leads.map(l=>`
+ <tr onclick="go('detail')">
+  <td><input type="checkbox" onclick="event.stopPropagation()"></td>
+  <td><div class="lead-name">${l[2]?'<span class="stale" title="No activity 7 days"></span>':''}${l[1]}</div><div class="sub">+91 98•••• ${l[0].charCodeAt(0)}${l[0].charCodeAt(1)}10</div></td>
+  <td><span class="chip ${l[4]}">${l[3].toUpperCase()}</span></td>
+  <td><b style="color:var(--brass)">${l[5]}</b></td>
+  <td>${l[6]}</td>
+  <td style="${l[8]?'color:var(--red);font-weight:600':''}">${l[7]}</td>
+  <td><div class="own"><div class="avatar" style="background:${l[11]}">${l[10]}</div>${l[9]}</div></td>
+ </tr>`).join('');
+
+// ---------- kanban ----------
+const cols=[
+ ['New Lead',[['Neha Gupta','₹70L','QR Expo','?','2h','hot'],['Imran Ali','₹48L','Portal','MK','5h','']]],
+ ['Contacted',[['Sanjay Kapoor','₹58L','99acres','MK','1d',''],['Deepa Nair','₹62L','Facebook','PS','2d','']]],
+ ['Qualified',[['Rohit Mehra','₹80–95L','Facebook','PS','2d',''],['Farhan D’souza','₹1.0Cr','Website','AR','3d','']]],
+ ['Site Visit',[['Anita Shah','₹1.2Cr','CP·Ravi','AR','Sat','']]],
+ ['Negotiation',[['Vikram Joshi','₹86L','Google','PS','4d','hot'],['Meera Pillai','₹78L','Referral','AR','1d','']]],
+ ['Booking',[['Kunal Verma','₹92L','CP·Ravi','AR','✓','']]],
+];
+const board=document.getElementById('board');
+board.innerHTML=cols.map(([name,cards],ci)=>`
+ <div class="col" data-col="${ci}">
+  <div class="col-head"><span class="cname">${name}</span><span class="ccount">${cards.length}</span><span class="cval">${['—','₹1.2Cr','₹1.9Cr','₹1.2Cr','₹1.6Cr','₹0.9Cr'][ci]}</span></div>
+  ${cards.map((c,i)=>kcard(c,ci,i)).join('')}
+ </div>`).join('');
+function kcard(c,ci,i){return `
+ <div class="kcard" draggable="true" id="kc-${ci}-${i}" onclick="go('detail')">
+  <div class="kn">${c[0]}</div>
+  <div class="kb">${c[1]}</div>
+  <div class="kf"><div class="avatar" style="width:20px;height:20px;font-size:9px">${c[3]}</div><small>${c[2]}</small><span class="age ${c[5]}">${c[4]}${c[5]?' ⚠':''}</span></div>
+ </div>`;}
+// drag & drop
+let dragEl=null;
+board.addEventListener('dragstart',e=>{const k=e.target.closest('.kcard');if(!k)return;dragEl=k;k.classList.add('dragging');});
+board.addEventListener('dragend',()=>{if(dragEl)dragEl.classList.remove('dragging');document.querySelectorAll('.col').forEach(c=>c.classList.remove('dragover'));dragEl=null;});
+board.addEventListener('dragover',e=>{const col=e.target.closest('.col');if(!col||!dragEl)return;e.preventDefault();document.querySelectorAll('.col').forEach(c=>c.classList.remove('dragover'));col.classList.add('dragover');});
+board.addEventListener('drop',e=>{const col=e.target.closest('.col');if(!col||!dragEl)return;e.preventDefault();col.appendChild(dragEl);col.classList.remove('dragover');
+ const stage=col.querySelector('.cname').textContent;
+ // update counts
+ document.querySelectorAll('.col').forEach(c=>c.querySelector('.ccount').textContent=c.querySelectorAll('.kcard').length);
+ toast(`Moved to "${stage}" — stage rule: note required · follow-up auto-created`);});
+
+// ---------- inventory tower ----------
+const st=['avail','hold','booked','sold'];
+const layout=[ // 8 floors x 4 units, deterministic pattern
+ [0,1,2,0],[0,0,2,3],[2,0,1,0],[0,3,0,2],[0,0,2,0],[1,0,0,3],[2,0,0,0],[0,2,1,0]];
+let sel=null;
+document.getElementById('towerGrid').innerHTML=layout.map((row,f)=>{
+ const fl=12-f;
+ return `<div class="floor"><span class="fl-lbl">F${fl}</span>${row.map((s,u)=>{
+  const no=`${fl}0${u+1}`,type=u%2?'3BHK':'2BHK';
+  return `<div class="unit u-${st[s]}" data-no="T2-${no}" data-type="${type}" data-st="${st[s]}" onclick="pick(this)">${no}<small>${type}</small></div>`;
+ }).join('')}</div>`;
+}).join('');
+function pick(el){
+ if(sel)sel.classList.remove('sel');sel=el;el.classList.add('sel');
+ const d=document.getElementById('udrawer');d.classList.add('on');
+ document.getElementById('uTitle').textContent=el.dataset.no+' · '+el.dataset.type;
+ const s=el.dataset.st;
+ document.getElementById('uMeta').textContent=(el.dataset.type==='3BHK'?'1450 sf super · East facing · 2 parking':'1120 sf super · West facing · 1 parking')+' · status: '+s.toUpperCase();
+ document.getElementById('uPrice').textContent=el.dataset.type==='3BHK'?'₹86.2 L':'₹64.8 L';
+}
+
+// ---------- platform: tenant directory ----------
+const tenants=[
+ ['SR','Sunrise Realty','sunrise','Pro','active','green',42,'1.2M',92,'₹52,500',86,'var(--accent)'],
+ ['MH','MetroHomes','metrohomes','Growth','active','green',18,'340K',61,'₹19,800',74,'var(--blue)'],
+ ['GA','GreenAcre Builders','greenacre','Enterprise','active','green',85,'2.8M',77,'₹1,10,000',91,'var(--brass)'],
+ ['VE','Vertex Estates','vertex','Growth','past_due','red',12,'96K',54,'₹13,200',38,'#7A4FB0'],
+ ['UL','UrbanLiving Props','urbanliving','Starter','trial','amber',4,'2.1K',22,'— trial d9/14',65,'var(--red)'],
+ ['PH','Prakash Housing','prakash','Pro','suspended','red',26,'610K',0,'₹0 (suspended)',12,'var(--ink2)'],
+];
+const stChip={active:'green',trial:'amber',past_due:'red',suspended:'red'};
+const stLbl={active:'ACTIVE',trial:'TRIAL',past_due:'PAST DUE',suspended:'SUSPENDED'};
+document.getElementById('tenantRows').innerHTML=tenants.map(t=>`
+ <tr onclick="toast('${t[1]} — client profile: usage, integrations health, subscription, timeline')">
+  <td><div class="own"><div class="avatar" style="background:${t[11]}">${t[0]}</div><div><b>${t[1]}</b><div class="sub">${t[2]}.hxgconnect.com</div></div></div></td>
+  <td><b>${t[3]}</b></td>
+  <td><span class="chip ${stChip[t[4]]}">${stLbl[t[4]]}</span></td>
+  <td>${t[6]}</td>
+  <td>${t[7]}</td>
+  <td><div class="src" style="margin:0"><div class="track" style="flex:none;width:64px"><div class="fill" style="width:${t[8]}%;background:${t[8]>85?'var(--red)':'var(--accent)'}"></div></div><small style="color:var(--ink2)">${t[8]}%</small></div></td>
+  <td><b style="color:var(--brass)">${t[9]}</b></td>
+  <td><b style="color:${t[10]>70?'var(--green)':t[10]>40?'var(--amber)':'var(--red)'}">${t[10]}</b></td>
+  <td onclick="event.stopPropagation()"><button class="pill" style="padding:3px 9px;font-size:11px" onclick="toast('Impersonation requested for ${t[1]} — awaiting client-admin approval · read-only · 60 min')">Impersonate</button></td>
+ </tr>`).join('');
+
+// ---------- field check-in simulation ----------
+const ciBtn=document.getElementById('checkinBtn');
+ciBtn.onclick=()=>{
+  const cam=document.getElementById('cam'),face=document.getElementById('face');
+  cam.classList.remove('snap');void cam.offsetWidth;cam.classList.add('snap');
+  face.style.transform='scale(1.15)';setTimeout(()=>face.style.transform='',350);
+  ciBtn.textContent='⏳ Verifying & submitting…';ciBtn.disabled=true;
+  setTimeout(()=>{
+    ciBtn.textContent='✓ Checked in — sent to manager';ciBtn.style.background='var(--green)';
+    document.getElementById('stepSelfie').innerHTML='<b class="step-done">Selfie captured ✓</b> · liveness ok · 12:31 pm';
+    // prepend to manager feed
+    const row=document.createElement('div');row.className='op-row';
+    row.innerHTML=`<div class="selfie">🙂</div>
+      <div class="oinfo"><b>You (Priya S) · Ad-hoc check-in</b><small>12:31 pm · Indirapuram, Ghaziabad · GPS ±9m</small></div>
+      <div class="op-status"><span class="chip green">VERIFIED ✓</span><small>selfie + GPS auto-sent</small></div>`;
+    const feed=document.getElementById('fieldFeed');feed.insertBefore(row,feed.firstElementChild);
+    toast('Check-in submitted → manager notified with selfie + live location');
+    setTimeout(()=>{ciBtn.textContent='📸 Take selfie & check in';ciBtn.style.background='';ciBtn.disabled=false;
+      document.getElementById('stepSelfie').textContent='Front camera only — no gallery uploads';},3500);
+  },900);
+};
+
+// ---------- waveform decoration ----------
+document.getElementById('wave').innerHTML=Array.from({length:24},(_,i)=>`<i style="height:${3+Math.abs(Math.sin(i*1.3))*11}px"></i>`).join('');
+</script>
+</body>
+</html>

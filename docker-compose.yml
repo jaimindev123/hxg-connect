@@ -1,0 +1,31 @@
+# Local stack: Postgres 16 + the API. `docker compose up` and you have a
+# working multi-tenant backend with a seeded super admin.
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: hxg_connect
+    ports: ["127.0.0.1:5432:5432"]   # local development only
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      retries: 20
+
+  api:
+    build: .
+    depends_on:
+      db: { condition: service_healthy }
+    env_file: .env
+    environment:
+      DATABASE_OWNER_URL: postgres://postgres:postgres@db:5432/hxg_connect
+      DATABASE_PLATFORM_URL: postgres://hxg_platform:hxg_platform_dev@db:5432/hxg_connect
+      DATABASE_APP_URL: postgres://hxg_app:hxg_app_dev@db:5432/hxg_connect
+    command: sh -c "node scripts/migrate.mjs && node dist/main.js"
+    ports: ["4000:4000"]
+    volumes: [uploads:/app/storage]   # selfies; move to S3/R2 in production
+
+volumes:
+  pgdata:
+  uploads:

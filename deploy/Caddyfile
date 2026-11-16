@@ -1,0 +1,24 @@
+# Automatic HTTPS for your domain, admin., and every client's subdomain.
+# Certificates are issued on first visit, but only for names the app
+# confirms exist (the "ask" check), so random subdomains get nothing.
+{
+	email {$ACME_EMAIL}
+	on_demand_tls {
+		ask http://api:4000/api/public/tls-allowed
+	}
+}
+
+https:// {
+	tls {
+		on_demand
+	}
+	# The certificate check is for Caddy only, never for the public.
+	@internal path /api/public/tls-allowed
+	respond @internal 404
+	encode zstd gzip
+	reverse_proxy api:4000
+}
+
+http:// {
+	redir https://{host}{uri} permanent
+}
