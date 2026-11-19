@@ -8,7 +8,11 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.hxgglobal.connect"
+      "bundleIdentifier": "com.hxgglobal.connect",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -55,7 +59,9 @@
           "isAndroidForegroundServiceEnabled": false
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-status-bar",
+      "./plugins/withAndroidReleaseSigning"
     ]
   }
 }

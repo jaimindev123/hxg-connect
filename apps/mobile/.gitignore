@@ -39,3 +39,10 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Android release signing (keep a backup outside the repo!)
+/credentials/
+*.keystore
+
+# local release outputs
+/build/
